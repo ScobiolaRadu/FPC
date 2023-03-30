@@ -2,6 +2,15 @@
 
 using namespace std;
 
+struct Token
+{
+    string s;
+    int len_w;
+    int line;
+    char* pointer;
+};
+
+
 bool isKeyword(string s)
 {
     string keywords[98]= {"alignas", "alignof", "and", "and_eq", "asm", "atomic_cancel", "atomic_commit", "atomic_noexcept", "auto",
@@ -34,7 +43,6 @@ bool isIdentifier(string s)
 
     return true;
 
-
 }
 
 bool isLiteral(string s)
@@ -62,6 +70,13 @@ bool isOperator(string s)
     return false;
 }
 
+bool isOperatorChar(char c)
+{
+    const string operators = "+-*/%<=>!&|~^?.";
+
+    return (operators.find(c) != string::npos);
+}
+
 bool isPunctuator(string s)
 {
     string punctuators[10] = {",", ";", "(", ")", "[", "]", "{", "}", ":"};
@@ -72,10 +87,18 @@ bool isPunctuator(string s)
     return false;
 }
 
-void lex(const string& s)
+bool isPunctuatorChar(char c)
+{
+    const string punctuators = ",;()[]{}:";
+
+    return (punctuators.find(c) != string::npos);
+}
+
+vector<Token> lex(const string& s)
 {
     const char* p = s.c_str();
     int k = 1;
+    vector<Token> tokens;
 
     while (*p != '\0')
     {
@@ -90,46 +113,113 @@ void lex(const string& s)
 
         const char* st_w = p;
         int len_w = 0;
-        while (*p != '\0' && *p != ' ' && *p != '\t' && *p != '\n')
+
+        while (*p != '\0')
         {
+            if (*p == ' ' || *p == '\t' || *p == '\n' ||
+                (isOperatorChar(*p)  && *(p+1) != ' ' && *(p+1) != '\n' && *(p+1) != '\t'
+                 && *(p-1) != ' ' && *(p-1) != '\n' && *(p-1) != '\t')
+                || isPunctuatorChar(*p))
+            {
+                break;
+            }
             p++;
             len_w++;
         }
 
-        string word(st_w, len_w);
-
-        if(isKeyword(word))
+        if (len_w > 0)
         {
-            cout <<"Token: "<< word <<" Type: keyword "<<"Pointer: "<< static_cast<const void*>(st_w)<<" Line: " <<k<<endl;
+            Token token;
+            token.s = string(st_w, len_w);
+            token.len_w = len_w;
+            token.line = k;
+            token.pointer = const_cast<char*>(st_w);
+            tokens.push_back(token);
         }
 
-        else if(isLiteral(word))
+        if (isOperatorChar(*p))
         {
-            cout <<"Token: "<< word <<" Type: literal "<<"Pointer: "<< static_cast<const void*>(st_w)<<" Line: " <<k<<endl;
+            const char* st_w = p;
+            int len_w = 0;
+
+            while (*p != '\0' && isOperatorChar(*p))
+            {
+                p++;
+                len_w++;
+            }
+
+            Token token;
+            token.s = string(st_w, len_w);
+            token.len_w = len_w;
+            token.line = k;
+            token.pointer = const_cast<char*>(st_w);
+            tokens.push_back(token);
         }
 
-        else if(isOperator(word))
+        if (isPunctuatorChar(*p))
         {
-            cout <<"Token: "<< word <<" Type: operator "<<"Pointer: "<< static_cast<const void*>(st_w)<<" Line: " <<k<<endl;
+            const char* st_w = p;
+            int len_w = 0;
+
+            while (*p != '\0' && isPunctuatorChar(*p))
+            {
+                p++;
+                len_w++;
+            }
+
+            Token token;
+            token.s = string(st_w, len_w);
+            token.len_w = len_w;
+            token.line = k;
+            token.pointer = const_cast<char*>(st_w);
+            tokens.push_back(token);
+        }
+    }
+
+    return tokens;
+}
+
+
+void printTokens(const vector<Token>& tokens)
+{
+    for (const Token& token : tokens)
+    {
+
+        if(isKeyword(token.s))
+        {
+            cout <<"Token: "<<token.s<<" Type: keyword";
         }
 
-        else if(isIdentifier(word))
+        else if(isLiteral(token.s))
         {
-            cout <<"Token: "<< word <<" Type: identifier "<<"Pointer: "<< static_cast<const void*>(st_w)<<" Line: " <<k<<endl;
+            cout <<"Token: "<<token.s<<" Type: literal";
         }
 
-        else if (isPunctuator(word))
+        else if(isOperator(token.s))
         {
-            cout <<"Token: "<< word <<" Type: punctuator "<<"Pointer: "<< static_cast<const void*>(st_w)<<" Line: " <<k<<endl;
+            cout <<"Token: "<<token.s<<" Type: operator";
+        }
+
+        else if(isIdentifier(token.s))
+        {
+            cout <<"Token: "<<token.s<<" Type: identifier";
+        }
+
+        else if (isPunctuator(token.s))
+        {
+            cout <<"Token: "<<token.s<<" Type: punctuator";
         }
 
         else
         {
-            cout<<"Lexical error at : "<<word<<" Pointer: "<<static_cast<const void*>(st_w)<<" Line: "<<k<<endl;
+            cout<<"Lexical error at : "<<token.s;
         }
 
+        cout<< " Length: "<<token.len_w<<" Pointer: "<< static_cast<void*>(token.pointer)<<" Line: " <<token.line<<endl;
     }
 }
+
+
 string readFile(string file)
 {
     ifstream f(file);
@@ -142,12 +232,13 @@ int main()
 {
     string str;
     string file;
+    vector<Token> tokens;
     file="date.in";
     //cin>>file;
 
     str = readFile(file);
+    tokens = lex(str);
 
-    lex(str);
-
+    printTokens(tokens);
     return 0;
 }
