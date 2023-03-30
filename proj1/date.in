@@ -1,8 +1,8 @@
-while if
-x not else bool
+while if(x==5)
+Object.attrib
+x not else bool ceva=
 23 a _var
 (   * + int  "hello"
-<   something
-  ]  r!     a3_b xor_eq
-!a
-ceva
+<   something b++
+  ]       a3_b xor_eq
+!a   r!
