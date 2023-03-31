@@ -117,7 +117,7 @@ vector<Token> lex(const string& s)
         while (*p != '\0')
         {
             if (*p == ' ' || *p == '\t' || *p == '\n' ||
-                    (isOperatorChar(*p)  && *(p+1) != ' ' && *(p+1) != '\n' && *(p+1) != '\t'
+                    (isOperatorChar(*p)  && *(p+1) != ' ' && *(p+1) != '\n' && *(p+1) != '\t' && *(p+1) != '\0'
                      && *(p-1) != ' ' && *(p-1) != '\n' && *(p-1) != '\t')
                     || isPunctuatorChar(*p))
             {
