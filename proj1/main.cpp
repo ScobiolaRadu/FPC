@@ -1,4 +1,7 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -22,7 +25,6 @@ bool isKeyword(string s)
                           "static_assert", "static_cast", "struct", "switch", "synchronized", "template", "this", "thread_local", "throw", "true", "try", "typedef",
                           "typeid", "typename", "union", "unsigned", "using", "virtual", "void", "volatile", "wchar_t", "while", "xor", "xor_eq"
                          };
-
     for(int i=0; i<97; i++)
         if(s == keywords[i])
             return true;
@@ -212,7 +214,7 @@ void printTokens(const vector<Token>& tokens)
 
         else
         {
-            cout<<"Lexical error at : "<<token.s;
+            cout<<"Lexical error at: "<<token.s;
         }
 
         cout<< " Length: "<<token.len_w<<" Pointer: "<< static_cast<void*>(token.pointer)<<" Line: " <<token.line<<endl;
@@ -233,8 +235,7 @@ int main()
     string str;
     string file;
     vector<Token> tokens;
-    file="date.in";
-    //cin>>file;
+    cin>>file;
 
     str = readFile(file);
     tokens = lex(str);
