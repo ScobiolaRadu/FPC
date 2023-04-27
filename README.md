@@ -11,6 +11,7 @@ Sa se scrie un analizor lexical pentru un limbaj de programare la alegere. Scrie
 PROIECT 2
 
 Sa se scrie un program care primeste la intrare elementele unei gramatici independente de context oarecare, G, inclusiv cu -productii pentru care:
+
 a) calculeaza multimile First(X), Follow(X), pentru fiecare simbol X terminal sau neterminal
 
 b) elimina recursivitatea la stanga (pentru gramatici fără -producții)
