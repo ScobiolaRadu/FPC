@@ -1,0 +1,4 @@
+S -> aSA | aSB
+A -> aA | a
+B -> c | f
+C -> efgt | efgijk
