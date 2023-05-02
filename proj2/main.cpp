@@ -178,8 +178,6 @@ void read2(string f)
 
         while (km < n)
         {
-            // cout << init << " " << n << endl;
-            // cout << it[km][0] << " " << init[0] << endl;
 
             if (it[km][0] == init[0])
             {
@@ -232,6 +230,73 @@ void read2(string f)
     }
 }
 
+// c
+unordered_map<string, vector<string>> productions3;
+set<string> nonTerminals3;
+set<string> terminals3;
+
+unordered_map<string, set<string>> first3;
+unordered_map<string, set<string>> follow3;
+
+void read3(string f)
+{
+    ifstream file(f);
+    string line;
+    string result = "";
+    while (getline(file, line))
+    {
+        nonTerminals3.insert(line.substr(0, line.find(" -> ")));
+        string init = line.substr(0, line.find(" -> "));
+        size_t pos = line.find(" -> ");
+        string delimeter = " | ";
+        string subProd;
+        string production = line.substr(pos + 4, line.length());
+        pos = 0;
+
+        while ((pos = production.find(delimeter)) != string::npos)
+        {
+            subProd = production.substr(0, pos);
+            productions3[line.substr(0, line.find(" -> "))].push_back(subProd);
+            production.erase(0, pos + delimeter.length());
+        }
+
+        productions3[line.substr(0, line.find(" -> "))].push_back(production);
+        string prefix = productions3[init][0];
+        int max_prefix_len = 0;
+
+        for (auto it = productions3[init].begin(); it != productions3[init].end(); it++)
+        {
+            string s = *it;
+            prefix = prefix.substr(0, min(prefix.size(), s.size()));
+            for (int i = 0; i < s.size() && i < prefix.size(); i++)
+            {
+                if (s[i] != prefix[i])
+                {
+                    prefix = prefix.substr(0, i);
+                    break;
+                }
+            }
+        }
+
+        if (prefix != "")
+        {
+            nonTerminals3.insert(init + "'");
+
+            for (auto it = productions3[init].begin(); it != productions3[init].end(); it++)
+            {
+                string s = *it;
+                s = s.substr(prefix.size(), s.size());
+                if (s == "")
+                {
+                    s = "$";
+                }
+                productions3[init + "'"].push_back(s);
+            }
+            productions3.erase(init);
+            productions3[init].push_back(prefix + init + "'");
+        }
+    }
+}
 int main()
 {
     // a
@@ -276,7 +341,7 @@ int main()
     }
 
     // b
-    cout << "b):\n";
+    cout << "\nb):\n";
     read2("data2.in");
 
     for (auto it = nonTerminals2.begin(); it != nonTerminals2.end(); it++)
@@ -285,6 +350,22 @@ int main()
         auto it2 = productions2[*it].begin();
         cout << *it2;
         for (auto it2 = productions2[*it].begin() + 1; it2 != productions2[*it].end(); it2++)
+        {
+            cout << " | " << *it2;
+        }
+        cout << endl;
+    }
+
+    // c
+    cout << "\nc):\n";
+    read3("data3.in");
+
+    for (auto it = nonTerminals3.begin(); it != nonTerminals3.end(); it++)
+    {
+        cout << *it << " -> ";
+        auto it2 = productions3[*it].begin();
+        cout << *it2;
+        for (auto it2 = productions3[*it].begin() + 1; it2 != productions3[*it].end(); it2++)
         {
             cout << " | " << *it2;
         }
